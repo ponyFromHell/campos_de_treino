@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<head>
+<meta charset="UTF-8">
+<title>Calculador de Treino - eRepublik - by Pony do Inferno - v 1.0</title>
+<style>
+* {
+	margin:0;
+	padding:0;
+}
+body {
+	text-align: center;
+	font-family: Helvetica, sans-serif;
+}
+.content {
+	width: 90%;
+	margin: 0 auto;
+	padding-top: 1em;
+}
+h1 {
+	margin-bottom: 1em;
+}
+h4 {
+	margin-bottom: 0.4em;
+}
+#campos {
+	width: 100%;
+	display: table;
+	border-collapse: collapse;
+}
+#campos div.campo {
+	width: 25%;
+	border: 2px solid black;
+	display: table-cell;
+	padding:0.8em;
+}
+#campos div.campo div {
+	text-align: left;
+}
+#contrato {
+	margin: 1em auto;
+	width: 50%;
+	border: 2px solid black;
+	padding-top: 1em;
+	padding-bottom: 1.5em;
+}
+#contrato div {
+	width: 25%;
+	margin: 0 auto;
+	text-align: left;
+}
+button {
+	width: 30%;
+	padding: 0.5em;
+	font-size: 1.5em;
+	font-weight: bold;
+	margin: 1em auto;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: 100ms;
+}
+button:hover {
+	transition: 100ms;
+}
+input[type=radio] {
+	margin-right: 0.5em;
+}
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+table, th, td {
+    border: 2px solid black;
+	margin-top: 2em;
+}
+th, td {
+	padding: 15px;
+}
+
+.footer {
+	margin-top: 2em;
+	padding-top: 2em;
+	font-size: 0.8em;
+	padding-left: 20%;
+	padding-right: 20%;
+	vertical-align: top;
+	padding-bottom: 2em;
+}
+.footer div {
+	margin-left: 1%;
+	width: 31%;
+	display: inline-block;
+	vertical-align: top;
+}
+#tema {
+	width: 100px;
+}
+/* temas huehuehue */
+.twi {
+	background-color:#B689C8;
+	color: #131F46;
+}
+.twi .campo,
+.twi #contrato,
+.twi button,
+.twi td,
+.twi select {
+	background-color:#D19FE3;
+}
+.twi button {
+	color: #662D8A;
+}
+.twi select,
+.twi #campos div.campo,
+.twi #contrato,
+.twi table, .twi th, .twi td {
+	border-color: #A76BC2;
+}
+.twi button:hover {
+	background-color:#ED438A;
+	color: #D19FE3;
+}
+.twi th {
+	background-color: #C9AAD0;
+}
+/**************************************************/
+.rd {
+	background-color:#77B0E0;
+	color: #460025;
+}
+.rd .campo,
+.rd #contrato,
+.rd button,
+.rd td,
+.rd select {
+	background-color:#9EDBF9;
+}
+.rd button {
+	color: #C6006F;
+}
+.rd select,
+.rd #campos div.campo,
+.rd #contrato,
+.rd table, .rd th, .rd td {
+	border-color: #66A4CB;
+}
+.rd button:hover {
+	background-color:#1E98D3;
+	color: #FF00AA;
+}
+.rd th {
+	background-color: #88C4EB;
+}
+/**************************************************/
+.shy {
+	background-color:#FEE78F;
+	color: #035350;
+}
+.shy .campo,
+.shy #contrato,
+.shy button,
+.shy td,
+.shy select {
+	background-color:#FDF6AF;
+}
+.shy button {
+	color: #035350;
+}
+.shy select,
+.shy #campos div.campo,
+.shy #contrato,
+.shy table, .shy th, .shy td {
+	border-color: #00ADA8;
+}
+.shy button:hover {
+	background-color:#EAD463;
+	color: #EB81B4;
+}
+.shy th {
+	background-color: #EAD463;
+}
+
+/**************************************************/
+.pp {
+	background-color:#F3B6CF;
+	color: #80D1F8;
+}
+/**************************************************/
+.rara {
+
+}
+/**************************************************/´
+.aj {
+
+}
+
+</style>
+<script>
+	//variaveis globais
+	var campos = {
+		1: {'str': 5.0, 'cost': 0.0}, 
+		2: {'str': 2.5, 'cost': 0.19},
+		3: {'str': 5.0, 'cost': 0.89},
+		4: {'str': 10.0, 'cost': 1.79},
+	};
+	var contratos = {0: 0.0, 5: 25.0,9: 53.0}; //desconto x custo
+	
+	//funcoes uteis
+	function isChecked(name) {
+		return document.querySelector('input[name="' + name + '"]:checked') ? true : false;
+	}
+	function checkedValue(name) {
+		return isChecked(name) ? document.querySelector('input[name="' + name + '"]:checked').value : null;
+	}
+	function addTdToTr(trId, content) {
+		tr = document.getElementById(trId);
+		td = document.createElement("td");
+		td.innerHTML = content;
+		tr.appendChild(td);
+	}
+	
+	//calculo de valores
+	function calcular() {
+		for (var i in campos) {
+			if (!isChecked("campo" + i)) {
+				alert("Selecione uma opção para o campo de " + campos[i].cost + " Golds!");
+				return;
+			}
+		}
+		if (!isChecked("contrato")) {
+			alert("Selecione uma opção quanto aos contratos de treino!");
+			return;
+		}
+		//Agora que passou por tudo, hora do calculo!
+		document.getElementById("result").innerHTML = "";
+		var strDay = 0.0; //comeca com a força media so de ter cumprido a tarefa diaria, 9 de forca / 5 dias
+		for (var i in campos) {
+			strDay += (campos[i].str)*checkedValue("campo" + i);
+		}
+		strDay += strDay > 0.0 ? 1.8 : 0.0;// adiciona 1.8 de bonus medio diario - mas so se treinou neste dia! tarefa diaria = 9 de forca / 5 dias
+		addTdToTr("result", strDay.toFixed(2));
+		addTdToTr("result", (strDay*30).toFixed(2));
+		var custo = contratos[checkedValue("contrato")] / 30.0; //comeca com o custo do contrato por 30, ie o diario
+		for (var i in campos) {
+			if (checkedValue("campo" + i) > 0) {
+				custo += campos[i].cost * (1.0 - checkedValue("contrato")/10.0);
+			}
+		}
+		addTdToTr("result", "-" + custo.toFixed(2));
+		addTdToTr("result", "-" + (custo*30).toFixed(2));
+		addTdToTr("result", (strDay*30*5.0/250.0).toFixed(2)); //cada 250 de forca da +5 golds pela super soldier
+		//final
+		var finalResult = (strDay*30*5.0/250.0 - custo*30).toFixed(2);
+		addTdToTr("result", finalResult  >= 0 ? finalResult : "<span style='color:red;'>" + finalResult + "</span>");
+	}
+	
+	//funcao ao carregar a pagina
+	function carregaCampos() {
+		//carrega os divs de radio de campo de treino
+		var camposDiv = document.getElementById("campos");
+		for (var key in campos) {
+			var div = document.createElement("div");
+			div.classList.add('campo');
+			div.innerHTML = geraCampo(key);
+			camposDiv.appendChild(div);
+		}
+		//roda o calculo inicial
+		calcular();
+	}
+	function geraCampo(n) {
+		var v = campos[n].cost;
+		var retorno = "<h4>N&iacute;vel do Campo ";
+		if (v == 0.0) {
+			retorno += "Gratuito";
+		} else {
+			retorno += "de " + v + " Golds";
+		}
+		retorno += "</h4><div>";
+		var id = 'campo' + n + '_0';
+		retorno += '<input type="radio" id="' + id + '" name="campo' + n + '" value="0" checked><label for="' + id + '">N&atilde;o treinar neste campo</label><br>';
+		for (var i = 1; i <= 4; i++) {
+			id = 'campo' + n + '_' + i;
+			retorno += '<input type="radio" id="' + id + '" name="campo' + n + '" value="' + i + '"><label for="' + id + '">N&iacute;vel ' + i + '</label><br>';
+		}
+		retorno += '</div>';
+		return retorno;
+	}
+	
+	//tema
+	//var themes = {"twi" : "Stars", "rd":"Rainbow", "shy":"Butterfly", "pp":"Candy", "rara":"Gems", "aj":"Apples"};
+	var themes = {"twi" : "Stars", "rd":"Rainbow", "shy":"Butterfly"}; //mais temas na proxima versao!
+	function loadThemes() {
+		var sel = document.getElementById("tema");
+		for (var i in themes) {
+			sel.options[sel.options.length] = new Option(themes[i],i);
+		}
+	}
+	function changeTheme() {
+		var sel = document.getElementById("tema");
+		for (var i in themes) {
+			document.body.classList.remove(i);
+		}
+		document.body.classList.add(sel.options[sel.selectedIndex].value);
+	}
+</script>
+</head>
+<body onload="carregaCampos();loadThemes();" class="twi">
+	<div class="content">
+		<h1>Calculador de Treino - eRepublik - by <a href="https://www.erepublik.com/en/citizen/profile/6640832">Pony do Inferno</a> - v. 1.0</h1>
+		<!-- TODO: LÍNGUAS SÃO 3: pt, es, en. Ou melhor, fazer 3 htmls diferentes! -->
+		
+		<div id="campos">
+		</div>
+		<div id="contrato">
+			<h4>Contrato de Treino</h4>
+			<div>
+				<input type="radio" id="contrato0" name="contrato" value="0" checked><label for="contrato0">Nenhum</label><br>
+				<input type="radio" id="contrato5" name="contrato" value="5"><label for="contrato5">50% a 25 golds</label><br>
+				<input type="radio" id="contrato9" name="contrato" value="9"><label for="contrato9">90% a 53 golds</label><br>
+			</div>
+		</div>
+		
+		<button name="calcular" onclick="calcular();">Calcular</button>
+		
+		<table>
+			<thead>
+				<tr>
+					<!-- TODO: adicionar custo absoluto (inicial) para upar os campos (c/ e s/ promo) -->
+					<th>For&ccedil;a/dia</th>
+					<th>For&ccedil;a/m&ecirc;s</th>
+					<th>Custo/dia</th>
+					<th>Custo/m&ecirc;s</th>
+					<th>Ganho/m&ecirc;s</th>
+					<th>Líquido/m&ecirc;s</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr id="result">
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<div class="footer">
+			<div>
+			<label for="tema">Escolha seu tema: 
+			<select id="tema" name="tema" onchange="changeTheme();">
+			</select>
+			<br>
+			Mais temas na pr&oacute;xima vers&atilde;o!
+			</div>
+			<div>
+			&copy; <a href="https://www.erepublik.com/en/citizen/profile/6640832">Pony do Inferno</a>
+			<br>Licença: <a href="http://www.wtfpl.net/">WTFPL</a>
+			</div>
+			<div>
+			Em breve: uma <strong>mini-ajuda</strong> sobre os termos usados
+			</div>
+		</div>
+	</div>
+</body>
+</html>
